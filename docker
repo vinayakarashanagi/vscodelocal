@@ -168,8 +168,40 @@ cd /var/www/html
 echo "This is apache2" >index.html
 service apache2 start
 
-
-
+pipeline {
+  agent any
+  
+  stages {
+    stage('Git Checkout') {
+      steps {
+        git branch: 'main', url: 'https://github.com/vinayakarashanagi/Petclinic.git'
+      }
+    }
+    stages {
+    stage('Image build') {
+      steps {
+        sh 'docker image build -t vinnu17/searchapp:v$BUILD_ID .'
+        sh 'docker image tag vinnu17/searchapp:v$BUILD_ID vinnu17/searchapp:latest'
+      }
+    }
+    stages {
+    stage('Image push') {
+      steps {
+        
+        sh 'docker login -u ${user} - p ${pass}'
+        sh 'docker image push vinnu17/searchapp:v$BUILD_ID'
+        sh 'docker image push vinnu17/searchapp:latest'
+        sh 'docker image rmi push vinnu17/searchapp:v$BUILD_ID vinnu17/searchapp:latest'
+      }
+    }
+    stages {
+    stage('Creating Contanier') {
+      steps {
+        sh 'docker run -td --name firstapp -p 3000:3000 vinnu17/searchapp:latest'
+      }
+    }
+ }
+}
 
 
 
