@@ -1,0 +1,272 @@
+
+maven to build application generate in artifact in the form of  jar 
+sudo apt-get update -y
+sudo apt install openjdk-11-jre -y
+sudo apt-get install maven -y
+
+mvn validate
+mvn compile
+mvn test
+mvn package (generate artifact jar file with all dependencies)
+mvn insatll (build project/application)
+mvn clean (delete target)
+mvn clean package 
+
+To execute java based project command 
+
+java -jar target/spring-boot-web.jar (path-of-jar/war-file)
+
+Deploy application on Tomcatserver
+
+Tomcat is a webserver which is used for java based application
+Permission owner,group,others
+r=4 w=2 x=1
+chmod 777 filename (rwx-rwx-rwx)
+chmod 776 filename (rwx-rwx-rw)
+chmod -R 777 folder (ompleted access) 
+
+##################----INSTALL TOMCAT----##################
+cd /opt
+sudo wget https://archive.apache.org/dist/tomcat/tomcat-9/v9.0.65/bin/apache-tomcat-9.0.65.tar.gz
+sudo tar -xvf apache-tomcat-9.0.65.tar.gz
+
+cd /opt/apache-tomcat-9.0.65/conf
+sudo vi tomcat-users.xml
+# ---add-below-line at the end (2nd-last line)----
+# <user username="admin" password="admin1234" roles="admin-gui, manager-gui"/>
+
+sudo ln -s /opt/apache-tomcat-9.0.65/bin/startup.sh /usr/bin/startTomcat
+sudo ln -s /opt/apache-tomcat-9.0.65/bin/shutdown.sh /usr/bin/stopTomcat
+
+sudo vi /opt/apache-tomcat-9.0.65/webapps/manager/META-INF/context.xml
+
+comment:
+<!-- Valve className="org.apache.catalina.valves.RemoteAddrValve"
+  allow="127\.\d+\.\d+\.\d+|::1|0:0:0:0:0:0:0:1" /> -->
+
+sudo vi /opt/apache-tomcat-9.0.65/webapps/host-manager/META-INF/context.xml
+
+comment:
+<!-- Valve className="org.apache.catalina.valves.RemoteAddrValve"
+  allow="127\.\d+\.\d+\.\d+|::1|0:0:0:0:0:0:0:1" /> -->
+
+sudo stopTomcat
+sudo startTomcat
+
+sudo cp target/*.war /opt/apache-tomcat-9.0.65/webapps/
+#############################################################
+
+--- INSTALL JENKINS ON LINUX METHOD -2 ---
+
+sudo apt update -y
+sudo apt install openjdk-11-jre -y
+sudo wget https://updates.jenkins.io/download/war/2.387.3/jenkins.war
+java -jar jenkins.war  --httpPort=8090
+
+
+pipeline {
+  agent any
+  
+  tools{
+        jdk 'jdk11'
+        maven 'maven3'
+        }
+  
+  environment{
+    SCANNER_HOME= tool 'sonar-scanner'
+  }
+  stages {
+    stage('Git Checkout') {
+      steps {
+        git branch: 'main', url: 'https://github.com/vinayakarashanagi/Petclinic.git'
+      }
+    }
+    
+    stage('Maven Compile') {
+      steps {
+        sh 'mvn compile'
+      }
+    }
+    
+    stage('Sonarqube Analysis') {
+      steps {
+        withSonarQubeEnv('sonar-server') {
+          sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=Petclinic \
+          -Dsonar.java.binaries=. \
+          -Dsonar.projectKey=Petclinic '''
+        }
+      }
+    }
+    
+    stage('Build') {
+      steps {
+        sh 'mvn clean package'
+      }
+    }
+  }
+}
+
+testcases
+
+pipeline {
+  agent any
+  
+  tools{
+        jdk 'jdk17'
+        maven 'maven3'
+        }
+  
+  environment{
+    SCANNER_HOME= tool 'sonar-scanner'
+  }
+  stages {
+    stage('Git Checkout') {
+      steps {
+        git branch: 'main', url: 'https://github.com/vinayakarashanagi/Petclinic.git'
+      }
+    }
+    
+    stage('Maven Compile') {
+      steps {
+        sh 'mvn clean package'
+      }
+    }
+    
+    stage('Test cases') {
+      steps {
+        sh 'mvn test'
+      }
+    }
+    
+    stage('Sonarqube Analysis') {
+      steps {
+        withSonarQubeEnv('sonar-server') {
+          sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=Petclinic \
+          -Dsonar.java.binaries=. \
+          -Dsonar.projectKey=Petclinic '''
+        }
+      }
+    }
+   
+    stage('Deploy') {
+      steps {
+        sh 'sudo cp target/petclinic.war /opt/apache-tomcat-9.0.65/webapps'
+      }
+    }
+  }
+}
+------------------------------
+
+Docker install
+
+
+
+--- Docker Installation ---
+
+sudo apt-get update
+sudo apt-get install ca-certificates curl gnupg
+
+sudo install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+sudo chmod a+r /etc/apt/keyrings/docker.gpg
+
+echo \
+  "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+  "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+sudo apt-get update
+
+sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y 
+
+sudo apt install docker-compose -y 
+
+service docker restart
+sudo usermod -aG docker $USER
+newgrp docker
+sudo chmod 666 /var/run/docker.sock
+sudo systemctl restart docker
+
+
+# TO ISNTALL SONARQUBE USING DOCKER RUN BELOW COMMAND  
+docker run -d --name sonar -p 9000:9000 sonarqube:lts-community
+
+
+---------------------------
+k8s install
+
+apt update -y
+
+apt install -y ca-certificates curl gnupg lsb-release
+
+mkdir -p /etc/apt/keyrings
+
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+
+echo \
+"deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+$(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+apt update
+
+apt install -y containerd.io
+
+service containerd status
+
+containerd config default > /etc/containerd/config.toml
+
+edit /etc/containerd/config.toml  
+
+if SystemdCgroup = false 
+change
+  SystemdCgroup = true
+
+service containerd restart
+
+Installing Kubeadm, Kubectl, and Kubelet
+
+curl -fsSLo /etc/apt/keyrings/kubernetes.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
+
+echo "deb [signed-by=/etc/apt/keyrings/kubernetes.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+
+apt update (if error )
+
+run these command
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.28/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.28/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
+
+apt install -y kubeadm kubectl kubelet
+
+apt-mark hold kubeadm kubectl kubelet
+
+swapoff -a
+
+modprobe br_netfilter
+
+echo br_netfilter | sudo tee /etc/modules-load.d/kubernetes.conf
+
+kubeadm init --pod-network-cidr=10.244.0.0/16 (if error) check  /proc/sys/net/ipv4/ip_forward it wll be 0
+run kubeadm reset
+set  ech0 1 > /proc/sys/net/ipv4/ip_forward
+
+run kubeadm init --pod-network-cidr=10.244.0.0/16
+initialized successfully
+mkdir -p $HOME/.kube
+sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+kubectl apply -f https://raw.githubusercontent.com/flannel-io/flannel/master/Documentation/kube-flannel.yml
+
+kubectl taint node (ip) node-role.kubernetes.io/control-plane:NoSchedule-
+
+sucessfully installed k8s
+
+
+
+
+
+
+
+
+
+

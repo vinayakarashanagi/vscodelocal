@@ -1,0 +1,198 @@
+# Set up Docker's apt repository
+
+# Add Docker's official GPG key:
+sudo apt-get update
+sudo apt-get install ca-certificates curl gnupg
+
+sudo install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+sudo chmod a+r /etc/apt/keyrings/docker.gpg
+
+# Add the repository to Apt sources:
+echo \
+  "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+  "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+# Install the Docker packages.
+# To install the latest version, run:
+
+sudo apt-get update
+
+sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y 
+
+sudo apt install docker-compose -y 
+
+# Add permission 
+
+service docker restart
+sudo usermod -aG docker $USER
+newgrp docker
+sudo chmod 666 /var/run/docker.sock
+sudo systemctl restart docker
+
+# check 
+service docker status 
+docker --version 
+docker info
+
+
+# Common Commands:
+
+docker images  (all images)
+
+docker search centos (find images in docker hub)
+
+docker pull centos (download image from docker hub)
+
+docker run -it --name vinay ubunut(IMAGEname) /bin/bash  (name to a contanier)
+cat /etc/os-release
+
+docker start cname (start contanier)
+
+docker attach vinay (to go inside contanier)
+
+docker ps (runnig contanier) 
+docker ps -a
+
+docker stop cname
+docker rm cname 
+docker rmi cid
+
+---------
+
+# Dockerfile components and diff commands
+# Example
+docker run -it --name vcname ubuntu /bin/bash
+
+default dir cd tmp/
+create file myfile
+
+docker diff vcname 
+
+# o/p  c - change A - append D - deletion 
+
+# create image of this contanier
+docker commit(can create image form container) vcname updateimage (Imagename)
+
+# Now create contanier from this image 
+docker run -it --name testcname updateimage /bin/bash
+
+check the file create in the new contanier....
+
+-------------------
+
+# Dockerfile 
+
+FROM          # base image (os - ubunut/centos)
+RUN           # execute command create layer image
+MAINTANIER    # author/owner/description
+COPY          # copy file from local machine need to provide path (can't download files)
+ADD           # similar to copy can download files from internet like .zip can extrect file 
+EXPOSE        # to expose port number
+WORKDIR       # to set working directory
+CMD           # execute command but during contanier creation
+ENTRYPOINT    # similar to CMD but high priority 
+ENV           # env variables
+ARG  
+#Examples
+Dockerfile
+FROM ubuntu
+RUN echo "This is first dockerfile " >/tmp/testfile
+
+# To create image out of dockerfile
+docker build -t myimage .
+docker ps
+docker images
+# Now create contanier from image
+docker run -it --nmae tessting myimage /bin/bash
+cat /tmp/
+
+FROM ubuntu
+WORKDR /tmp
+RUN echo "This is first dockerfile " >/tmp/testfile
+ENV nyname vinay
+COPY testfile1 /tmp
+ADD test.tar.gz /tmp
+
+
+#docker volume(like a dir) container to container
+
+create files
+FROM ubuntu
+VOLUME ["/myvolume1"]
+
+#create image from dockerfile
+docker built -t myimage .
+#now create a contanier from this image
+docker run -it --name contanier1 myimage /bin/bash/
+v wil be present 
+
+#now share volume with other contanier 
+
+docker run -it --name contanier2 --privileged=true --volumes-from contanier1 ubunut /bin/bash/ 
+
+#Now creating volume by command 
+
+docker run -it --name contanier3 -v /volume2 ubunut /bin/bash
+share volume
+docker run -it --name contanier4 --privileged=true --volumes-from contanier3 ubunut /bin/bash
+#check by creating files 
+
+
+Host to container
+
+verify files i /home/ec2-user
+
+docker run -it --name hostcont -v /home/ec2-user:/vinay --privileged=true ubunutu /bin/bash
+create file exit
+now check in ec2
+
+other commands
+docker volume ls 
+docker volume create vname
+docker volume em vname
+docker volume prune (to remove unused volume)
+docker volume inspect vname
+docker container inspect vname
+
+# port expose in docker 
+
+docker run -d --name server -p 80:80 ubunutu 
+docker ps
+docker port server
+docker exec -it server /bin/bash 
+apt-get update
+apt-get install apache2 -y 
+cd /var/www/html
+echo "This is apache2" >index.html
+service apache2 start
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

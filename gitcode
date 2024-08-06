@@ -1,0 +1,83 @@
+yum install git -y 
+which git
+git --version 
+
+
+
+git config --global user.name "vinay"
+git config --global user.email "vinayakarashnagai@gmail.com"
+git config --list
+
+create directory and doc
+git init 
+
+create file 
+test.txt
+
+git status
+git add .
+git commit -m "Added new file"
+git status 
+git log
+git show (id)
+git remote add origin url 
+git push origin master
+
+create directory and doc
+git init 
+
+create file 
+test.txt
+
+git init
+git status
+git remote add origign master url 
+git pull origin master
+git git log 
+git show (id)
+
+To ignore some file create hidden file vi .gitinore
+eg : *.css *.java 
+git add .gitignore
+git commit -m "igore *.css *.java"
+git status
+Test create some file and check
+
+git log -1 (to check last commit)
+git log --oneline (to check all commit in on line)
+git log --grep "igmore"  (if dont know commit id )
+
+BRANCH
+
+git branch (Avaliable branch)
+git branch branchname
+git checkout branchname   (To switch branch)
+git branch -d branchname (To delete branch)
+GIT merge branchname (To merge branch) conflict (while merge if get conflict)
+
+Git stashing (to stash an item only applies to modified file)
+
+git stash (to stash an item)
+git stash list
+git stash apply stash@{0}  (to apply stashed item) add and commit
+git stash clear (to clean stash)
+
+git reset filename (code completed added to stg area if you want to add some info)
+git reset .
+git reset --hard (code completed added to stg area if you want to delete the file)
+
+Git revert (code completed and added to stg and made a commit)
+To undo the commit
+git revert (commit-id) add ignore this
+
+Remove untracked files git clean -n 
+git clean -f
+
+To apply tag
+git tag -a tagname -m "message" commit-id
+git tag (all tags)
+git show tagname
+git tag -d tagname
+
+git clone url 
+
