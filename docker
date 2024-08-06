@@ -168,6 +168,10 @@ cd /var/www/html
 echo "This is apache2" >index.html
 service apache2 start
 
+
+
+#Containerize an application
+
 pipeline {
   agent any
   
