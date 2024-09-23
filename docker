@@ -117,6 +117,7 @@ ADD test.tar.gz /tmp
 
 
 #docker volume(like a dir) container to container
+docker run -d -v /home/vinay:/root/ ubuntu 
 
 create files
 FROM ubuntu
